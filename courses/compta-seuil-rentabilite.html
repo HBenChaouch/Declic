@@ -55,6 +55,8 @@ body { font-family: var(--ff-sans); background: var(--bg); color: var(--ink); mi
 .slider-row { display: flex; align-items: center; gap: 12px; }
 .slider-row label { font-size: 12px; color: var(--muted); font-family: var(--ff-mono); white-space: nowrap; min-width: 130px; }
 .slider-row input[type=range] { flex: 1; accent-color: var(--navy); cursor: pointer; touch-action: pan-y; }
+input[type=range]:focus { outline: none; }
+input[type=range]:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
 .slider-val { font-family: var(--ff-mono); font-size: 13px; font-weight: 600; color: var(--navy); min-width: 72px; text-align: right; }
 
 /* KPI strip */
@@ -453,7 +455,16 @@ window.addEventListener('resize', resize);
 resize();
 
 document.querySelectorAll('input[type=range]').forEach(sl => {
-  sl.addEventListener('touchstart', () => sl.focus(), { passive: true });
+  function valFromTouch(e) {
+    const t = e.touches[0];
+    const r = sl.getBoundingClientRect();
+    const min = Number(sl.min) || 0, max = Number(sl.max) || 100, step = Number(sl.step) || 1;
+    let v = Math.round((min + Math.max(0, Math.min(1, (t.clientX - r.left) / r.width)) * (max - min)) / step) * step;
+    v = Math.max(min, Math.min(max, v));
+    if (sl.value != v) { sl.value = v; sl.dispatchEvent(new Event('input', { bubbles: true })); }
+  }
+  sl.addEventListener('touchstart', e => { sl.focus(); valFromTouch(e); }, { passive: true });
+  sl.addEventListener('touchmove',  valFromTouch, { passive: true });
 });
 </script>
 </body>
