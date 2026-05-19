@@ -505,6 +505,10 @@ btn.addEventListener('click', () => {
 
 window.addEventListener('resize', resize);
 resize();
+
+document.querySelectorAll('input[type=range]').forEach(sl => {
+  sl.addEventListener('touchstart', () => sl.focus(), { passive: true });
+});
 </script>
 </body>
 </html>

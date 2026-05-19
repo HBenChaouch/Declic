@@ -620,21 +620,9 @@ slL.addEventListener('input', () => {
 window.addEventListener('resize', update);
 update();
 
-/* ── DEBUG MOBILE — à supprimer après diagnostic ── */
-const _sliders = [slC, slEps, slL];
-const _names   = ['slC', 'slEps', 'slL'];
-_sliders.forEach((sl, i) => {
-  ['touchstart','touchmove','touchend','pointerdown','pointermove','pointerup','input'].forEach(evt => {
-    sl.addEventListener(evt, e => {
-      console.log(`[${_names[i]}] ${evt}`, e.cancelable ? 'cancelable' : '', e.defaultPrevented ? 'PREVENTED' : '');
-    }, { passive: true });
-  });
+document.querySelectorAll('input[type=range]').forEach(sl => {
+  sl.addEventListener('touchstart', () => sl.focus(), { passive: true });
 });
-document.addEventListener('scroll', () => console.log('[page] scroll'), { passive: true });
 </script>
-
-<!-- Eruda — DevTools mobile (à supprimer après diagnostic) -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
 </body>
 </html>
