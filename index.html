@@ -4165,7 +4165,18 @@ const modal = document.getElementById('modal');
 const modalFrame = document.getElementById('modalFrame');
 const modalTitle = document.getElementById('modalTitle');
 function openModal(src) {
-  modalTitle.textContent = src; modalFrame.src = src;
+  modalTitle.textContent = src;
+  modalFrame.onload = () => {
+    // Baroud d'honneur iOS : focaliser le contexte de l'iframe (non synthétique,
+    // donc pas bloqué par isTrusted) pour tenter de lever le verrou d'activation.
+    try {
+      modalFrame.contentWindow.focus();
+      const doc = modalFrame.contentDocument;
+      const first = doc && doc.querySelector('input[type=range]');
+      if (first) first.focus({ preventScroll: true });
+    } catch (e) { /* about:blank ou pas prêt — sans effet, on ignore */ }
+  };
+  modalFrame.src = src;
   modal.setAttribute('open',''); modal.setAttribute('aria-hidden','false');
   document.body.style.overflow = 'hidden';
 }
