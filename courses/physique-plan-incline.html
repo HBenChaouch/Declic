@@ -58,8 +58,7 @@ body { font-family: var(--ff-sans); background: var(--bg); color: var(--ink); mi
 .controls { padding: 14px 20px; border-top: 1px solid var(--border); background: var(--bg-2); display: flex; flex-direction: column; gap: 10px; }
 .slider-row { display: flex; align-items: center; gap: 12px; }
 .slider-row label { font-size: 12px; color: var(--muted); font-family: var(--ff-mono); white-space: nowrap; min-width: 110px; }
-.slider-row input[type=range] { flex: 1; accent-color: var(--navy); cursor: pointer; touch-action: none; }
-input[type=range]:focus, input[type=range]:focus-visible { outline: none; }
+.slider-row input[type=range] { flex: 1; accent-color: var(--navy); cursor: pointer; }
 .slider-val { font-family: var(--ff-mono); font-size: 13px; font-weight: 600; color: var(--navy); min-width: 56px; text-align: right; }
 
 .status-bar { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-top: 1px solid var(--border); font-size: 13px; font-weight: 600; transition: background .3s; }
@@ -510,27 +509,6 @@ slMu.addEventListener('input',    () => { mu    = slMu.value/100; svMu.textConte
 window.addEventListener('resize', resize);
 resize();
 
-document.querySelectorAll('input[type=range]').forEach(sl => {
-  function setVal(clientX) {
-    const r = sl.getBoundingClientRect();
-    const min = Number(sl.min) || 0, max = Number(sl.max) || 100, step = Number(sl.step) || 1;
-    let v = Math.round((min + Math.max(0, Math.min(1, (clientX - r.left) / r.width)) * (max - min)) / step) * step;
-    v = Math.max(min, Math.min(max, v));
-    if (sl.value != v) { sl.value = v; sl.dispatchEvent(new Event('input', { bubbles: true })); }
-  }
-  let active = false;
-  sl.addEventListener('pointerdown', e => {
-    active = true;
-    sl.setPointerCapture(e.pointerId);
-    setVal(e.clientX);
-  });
-  sl.addEventListener('pointermove', e => { if (active) setVal(e.clientX); });
-  sl.addEventListener('pointerup', e => {
-    active = false;
-    try { sl.releasePointerCapture(e.pointerId); } catch (_) {}
-  });
-  sl.addEventListener('pointercancel', () => { active = false; });
-});
 </script>
 </body>
 </html>

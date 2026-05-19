@@ -208,8 +208,7 @@ body { font-family: var(--ff-sans); background: var(--bg); color: var(--ink); mi
 .slider-group { display: flex; flex-direction: column; gap: 4px; }
 .slider-row { display: flex; align-items: center; gap: 12px; }
 .slider-row label { font-size: 12px; color: var(--muted); font-family: var(--ff-mono); white-space: nowrap; min-width: 108px; }
-.slider-row input[type=range] { flex: 1; accent-color: var(--navy); cursor: pointer; touch-action: none; }
-input[type=range]:focus, input[type=range]:focus-visible { outline: none; }
+.slider-row input[type=range] { flex: 1; accent-color: var(--navy); cursor: pointer; }
 .slider-val { font-family: var(--ff-mono); font-size: 13px; font-weight: 600; color: var(--navy); min-width: 60px; text-align: right; }
 .slider-hint { font-size: 12px; color: var(--muted); line-height: 1.5; padding-left: 120px; font-style: italic; }
 .slider-hint strong { color: var(--ink); font-style: normal; font-weight: 600; }
@@ -245,7 +244,6 @@ input[type=range]:focus, input[type=range]:focus-visible { outline: none; }
   .slider-row input[type=range] {
     grid-row: 2; grid-column: 1;
     width: 100%;
-    touch-action: none;
   }
   .slider-val {
     grid-row: 2; grid-column: 2;
@@ -621,27 +619,6 @@ slL.addEventListener('input', () => {
 window.addEventListener('resize', update);
 update();
 
-document.querySelectorAll('input[type=range]').forEach(sl => {
-  function setVal(clientX) {
-    const r = sl.getBoundingClientRect();
-    const min = Number(sl.min) || 0, max = Number(sl.max) || 100, step = Number(sl.step) || 1;
-    let v = Math.round((min + Math.max(0, Math.min(1, (clientX - r.left) / r.width)) * (max - min)) / step) * step;
-    v = Math.max(min, Math.min(max, v));
-    if (sl.value != v) { sl.value = v; sl.dispatchEvent(new Event('input', { bubbles: true })); }
-  }
-  let active = false;
-  sl.addEventListener('pointerdown', e => {
-    active = true;
-    sl.setPointerCapture(e.pointerId);
-    setVal(e.clientX);
-  });
-  sl.addEventListener('pointermove', e => { if (active) setVal(e.clientX); });
-  sl.addEventListener('pointerup', e => {
-    active = false;
-    try { sl.releasePointerCapture(e.pointerId); } catch (_) {}
-  });
-  sl.addEventListener('pointercancel', () => { active = false; });
-});
 </script>
 </body>
 </html>
