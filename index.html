@@ -2091,7 +2091,8 @@ section { position: relative; }
 
 /* ===== Modal ===== */
 .modal {
-  position: fixed; inset: 0; z-index: 100;
+  position: absolute; top: 0; left: 0; width: 100%;
+  height: 100vh; height: 100dvh; z-index: 100;
   display: none; align-items: center; justify-content: center;
   padding: 4vw; background: rgba(20,33,61,.62);
 }
@@ -4167,14 +4168,28 @@ function resetContactForm() {
 const modal = document.getElementById('modal');
 const modalFrame = document.getElementById('modalFrame');
 const modalTitle = document.getElementById('modalTitle');
+let savedScrollY = 0;
+// Bloque le scroll d'arrière-plan SANS position:fixed (qui réintroduirait
+// le bug iframe iOS). On laisse passer les touches dans .modal-scroll (donc l'iframe).
+function lockTouch(e) {
+  if (e.target.closest && e.target.closest('.modal-scroll')) return;
+  e.preventDefault();
+}
 function openModal(src) {
   modalTitle.textContent = src; modalFrame.src = src;
-  modal.setAttribute('open',''); modal.setAttribute('aria-hidden','false');
+  savedScrollY = window.scrollY;
+  modal.style.top = savedScrollY + 'px';   // modale absolute calée sur le viewport courant
+  document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
+  document.addEventListener('touchmove', lockTouch, { passive: false });
+  modal.setAttribute('open',''); modal.setAttribute('aria-hidden','false');
 }
 function closeModal() {
   modal.removeAttribute('open'); modal.setAttribute('aria-hidden','true');
-  modalFrame.src = 'about:blank'; document.body.style.overflow = '';
+  modalFrame.src = 'about:blank';
+  document.removeEventListener('touchmove', lockTouch, { passive: false });
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
 }
 document.querySelectorAll('[data-demo]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.demo)));
 document.getElementById('modalClose2').addEventListener('click', closeModal);
